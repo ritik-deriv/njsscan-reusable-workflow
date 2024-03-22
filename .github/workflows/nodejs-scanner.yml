@@ -1,0 +1,164 @@
+name: Trivy Scanner
+
+on:
+  workflow_call:
+    secrets:
+      TRIVY_SLACK_WEBHOOK: 
+        required: true
+        description: "Webhook for Security Team's Slack Channel to send alerts on failed scans"
+        
+
+jobs:
+
+  scan:
+  
+    permissions:
+      contents: read
+      actions: read
+      
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.TRIVY_SLACK_WEBHOOK }}
+      SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+      PR_URL: ${{ github.event.pull_request.html_url }}
+      PR_CREATOR: ${{ github.event.pull_request.user.login }}
+      HEAD_COMMIT: ${{ github.event.pull_request.html_url }}/commits/${{ github.event.pull_request.head.sha }}
+      WORKFLOW_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      SENDER: ${{ github.event.sender.login }}
+      JOB_URL_NOT_FOUND: "*Job URL not found, Please Visit the Workflow URL to review failed checks...*"
+      SCAN_FAILED: false
+      SCAN_SUMMARY: "No Results Found"
+      
+    name: NodeJS Security Scan
+    runs-on: "ubuntu-22.04"
+    steps:
+      - name: Checkout code v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+
+      - name: NodeJS Scan - Table Format
+        uses: ajinabraham/njsscan-action@74e5a58c1edb363b84c9ddd626b0e22f038ac09e
+        with:
+          args: '. --config .njsscan.conf.yml --exit-warning'
+
+      - name: NodeJS Scan - JSON Format
+        uses: ajinabraham/njsscan-action@74e5a58c1edb363b84c9ddd626b0e22f038ac09e
+        with:
+          args: '. --config .njsscan.conf.yml --exit-warning --json --output njsscan-result.json'
+
+      - name: Parse JSON Scan File
+        run: |
+          
+          SCAN_FILE="njsscan-result.json"
+          scan_failed=false
+          high_vuln_count=0
+          medium_vuln_count=0
+          info_vuln_count=0
+          total_vuln_count=0
+          
+          function update_severity_count {
+          
+              context="$1"
+              keys="$2"
+              
+              echo "-----Counting Vulnerabilities for $context Context-----"
+          
+              for key in $keys
+              do
+                  severity=$(cat $SCAN_FILE | jq -r --arg context "$context" --arg error_key "$key" '.[$context].[$error_key].metadata.severity')
+                  echo "Key: $key and Severity: $severity"
+          
+                  case $severity in
+                      INFO)
+                          info_vuln_count=$(( $info_vuln_count + 1 ))
+                          ;;
+                      
+                      WARNING)
+                          medium_vuln_count=$(( $medium_vuln_count + 1 ))
+                          ;;
+                      
+                      ERROR)
+                          high_vuln_count=$(( $high_vuln_count + 1 ))
+                          ;;
+                      
+                      *)
+                          echo "Unknown Severity: $severity for Key: $key"
+                          ;;
+                  esac
+              done
+          }
+          
+          nodejs_keys=$(cat $SCAN_FILE | jq -r 'select(.nodejs) | .nodejs | keys[]')
+          
+          if [[ ! -z ${nodejs_keys} ]]; then
+              update_severity_count "nodejs" "$nodejs_keys"
+          fi
+          
+          templates_keys=$(cat $SCAN_FILE | jq -r 'select(.templates) | .templates | keys[]')
+          
+          if [[ ! -z "$templates_keys" ]]; then
+              update_severity_count "templates" "$templates_keys"
+          fi
+          
+          total_vuln_count=$(( $high_vuln_count + $medium_vuln_count + $info_vuln_count ))
+          
+          scan_summary=$(cat << EOF
+          Total Vuln Count: $total_vuln_count 
+          Breakdown:
+              High Vuln Count: $high_vuln_count 
+              Medium Vuln Count: $medium_vuln_count
+              Info Vuln Count: $info_vuln_count
+          EOF
+          )
+
+          echo "Scan Summary:"
+          echo "$scan_summary"
+          echo "SCAN_SUMMARY=${scan_summary}" >> $GITHUB_ENV
+          
+          if [[ "$total_vuln_count" -gt 0 ]]; then
+              scan_failed=true
+              echo "SCAN_FAILED=${scan_failed}" >> $GITHUB_ENV
+              exit 1
+          fi
+
+
+
+          
+      - name: Extract Job URL
+        if: ${{ env.SCAN_FAILED == 'true' }}
+        run: |
+          job_id=$(curl -L \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ github.token }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/attempts/${{ github.run_attempt }}/jobs | jq '.jobs[]? | select(.name=="image_scanner / Container Security Scan") | .id')
+            
+          if [[ ! -z ${job_id} && ${job_id} != "null" ]]; then
+            job_url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${job_id}"
+            echo "JOB_URL=${job_url}" >> $GITHUB_ENV   
+          fi
+          
+      - name: Send custom JSON data to Slack workflow
+        if: ${{ env.SCAN_FAILED  == 'true' }}
+        uses: slackapi/slack-github-action@6c661ce58804a1a20f6dc5fbee7f0381b469e001 # v1.25.0
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "text": "Trivy Scan Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Trivy Scan Failed*"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "`Workflow Run:` ${{ env.WORKFLOW_RUN_URL }}\n\n`JOB URL:` ${{ env.JOB_URL || env.JOB_URL_NOT_FOUND }}\n\n`Pull Request:` ${{ env.PR_URL }}\n\n`Head Commit:` ${{ env.HEAD_COMMIT }}\n\n`PR Creator:` *${{ env.PR_CREATOR }}*\n\n`Latest Committer:` *${{ env.SENDER }}*\n\n`Scan Summary:` ${{ env.SCAN_SUMMARY }}"
+                  }
+                }
+              ]
+            }
+          
