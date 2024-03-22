@@ -56,6 +56,9 @@ jobs:
           info_vuln_count=0
           total_vuln_count=0
           jq --version
+          whoami
+          id
+          docker run --rm -i ghcr.io/jqlang/jq:1.7.1 --version
           function update_severity_count {
           
               context="$1"
