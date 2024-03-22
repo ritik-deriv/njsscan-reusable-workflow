@@ -117,9 +117,12 @@ jobs:
 
           echo "Scan Summary:"
           echo "$scan_summary"
-
-          echo "SCAN_SUMMARY << EOF"
-          echo "$scan_summary"
+          
+          echo "$scan_summary" > scan_summary.txt
+          cat scan_summary.txt
+          
+          echo "SCAN_SUMMARY<<EOF"
+          cat scan_summary.txt
           echo EOF >> "$GITHUB_ENV"
           
           if [[ "$total_vuln_count" -gt 0 ]]; then
