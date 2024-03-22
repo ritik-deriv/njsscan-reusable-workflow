@@ -139,13 +139,13 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": "Trivy Scan Failed",
+              "text": NodeJS Scan Failed",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*Trivy Scan Failed*"
+                    "text": ":red-alert: *NodeJS Scan Failed*"
                   }
                 },
                 {
