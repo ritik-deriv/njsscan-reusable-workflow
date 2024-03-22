@@ -106,16 +106,15 @@ jobs:
           
           total_vuln_count=$(( $high_vuln_count + $medium_vuln_count + $info_vuln_count ))
           
-          scan_summary=" Total Vuln Count: $total_vuln_count\n Breakdown:\n\t High Vuln Count: $high_vuln_count\n\t Medium Vuln Count: $medium_vuln_count\n\t Info Vuln Count: $info_vuln_count"
+          scan_summary="\n Total Vuln Count: $total_vuln_count\n Breakdown:\n\t High Vuln Count: $high_vuln_count\n\t Medium Vuln Count: $medium_vuln_count\n\t Info Vuln Count: $info_vuln_count"
 
-          echo "Scan Summary:"
-          echo "$scan_summary"
-          
-          echo "SCAN_SUMMARY=${scan_summary}" >> $GITHUB_ENV
           
           if [[ "$total_vuln_count" -gt 0 ]]; then
               scan_failed=true
               echo "SCAN_FAILED=${scan_failed}" >> $GITHUB_ENV
+              echo "Scan Summary:"
+              echo -e "$scan_summary"
+              echo "SCAN_SUMMARY=${scan_summary}" >> $GITHUB_ENV
               exit 1
           fi
           
