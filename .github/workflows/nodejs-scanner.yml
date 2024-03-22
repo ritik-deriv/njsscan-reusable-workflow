@@ -106,7 +106,7 @@ jobs:
           
           total_vuln_count=$(( $high_vuln_count + $medium_vuln_count + $info_vuln_count ))
           
-          scan_summary="\n *Total Vuln Count: $total_vuln_count*\n *Breakdown:*\n\t *High Vuln Count: $high_vuln_count*\n\t *Medium Vuln Count: $medium_vuln_count*\n\t *Info Vuln Count: $info_vuln_count*"
+          scan_summary="\n :dave: *Total Vuln Count: $total_vuln_count*\n :clement: *Breakdown:*\n\t :vishal: *High Vuln Count: $high_vuln_count*\n\t :shantanu: *Medium Vuln Count: $medium_vuln_count*\n\t :harish: *Info Vuln Count: $info_vuln_count*"
 
           
           if [[ "$total_vuln_count" -gt 0 ]]; then
@@ -139,13 +139,13 @@ jobs:
           # For posting a rich message using Block Kit
           payload: |
             {
-              "text": NodeJS Scan Failed",
+              "text": "NodeJS Scan Failed",
               "blocks": [
                 {
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "*NodeJS Scan Failed*"
+                    "text": ":red-alert: *NodeJS Scan Failed*"
                   }
                 },
                 {
