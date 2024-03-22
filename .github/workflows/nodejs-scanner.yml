@@ -145,7 +145,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": ":red-alert: *NodeJS Scan Failed*"
+                    "text": "*NodeJS Scan Failed*"
                   }
                 },
                 {
