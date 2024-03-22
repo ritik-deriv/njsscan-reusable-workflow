@@ -106,7 +106,7 @@ jobs:
           
           total_vuln_count=$(( $high_vuln_count + $medium_vuln_count + $info_vuln_count ))
           
-          scan_summary="\n Total Vuln Count: $total_vuln_count\n Breakdown:\n\t High Vuln Count: $high_vuln_count\n\t Medium Vuln Count: $medium_vuln_count\n\t Info Vuln Count: $info_vuln_count"
+          scan_summary="\n *Total Vuln Count: $total_vuln_count*\n *Breakdown:*\n\t *High Vuln Count: $high_vuln_count*\n\t *Medium Vuln Count: $medium_vuln_count*\n\t *Info Vuln Count: $info_vuln_count*"
 
           
           if [[ "$total_vuln_count" -gt 0 ]]; then
