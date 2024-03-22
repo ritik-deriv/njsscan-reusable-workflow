@@ -56,8 +56,8 @@ jobs:
           info_vuln_count=0
           total_vuln_count=0
           
-          alias jq="docker run --rm -i ghcr.io/jqlang/jq:1.7.1"
-          docker run --rm -i ghcr.io/jqlang/jq:1.7.1 --version
+          alias jqd="docker run --rm -i ghcr.io/jqlang/jq:1.7.1"
+          jqd --version
           jq --version
           
           function update_severity_count {
@@ -69,7 +69,7 @@ jobs:
           
               for key in $keys
               do
-                  severity=$(cat $SCAN_FILE | jq -r --arg context "$context" --arg error_key "$key" '.[$context].[$error_key].metadata.severity')
+                  severity=$(cat $SCAN_FILE | jqd -r --arg context "$context" --arg error_key "$key" '.[$context].[$error_key].metadata.severity')
                   echo "Key: $key and Severity: $severity"
           
                   case $severity in
@@ -92,13 +92,13 @@ jobs:
               done
           }
           
-          nodejs_keys=$(cat $SCAN_FILE | jq -r 'select(.nodejs) | .nodejs | keys[]')
+          nodejs_keys=$(cat $SCAN_FILE | jqd -r 'select(.nodejs) | .nodejs | keys[]')
           
           if [[ ! -z ${nodejs_keys} ]]; then
               update_severity_count "nodejs" "$nodejs_keys"
           fi
           
-          templates_keys=$(cat $SCAN_FILE | jq -r 'select(.templates) | .templates | keys[]')
+          templates_keys=$(cat $SCAN_FILE | jqd -r 'select(.templates) | .templates | keys[]')
           
           if [[ ! -z "$templates_keys" ]]; then
               update_severity_count "templates" "$templates_keys"
