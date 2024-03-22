@@ -118,7 +118,7 @@ jobs:
           echo "Scan Summary:"
           echo "$scan_summary"
 
-          echo 'SCAN_SUMMARY<<EOF'
+          echo "SCAN_SUMMARY << EOF"
           echo "$scan_summary"
           echo EOF >> "$GITHUB_ENV"
           
