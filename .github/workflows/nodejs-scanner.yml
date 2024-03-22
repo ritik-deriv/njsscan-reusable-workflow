@@ -40,11 +40,13 @@ jobs:
           args: '. --config .njsscan.conf.yml --exit-warning'
 
       - name: NodeJS Scan - JSON Format
+        if: ${{ always() }}
         uses: ajinabraham/njsscan-action@74e5a58c1edb363b84c9ddd626b0e22f038ac09e
         with:
           args: '. --config .njsscan.conf.yml --exit-warning --json --output njsscan-result.json'
 
       - name: Parse JSON Scan File
+        if: ${{ always() }}
         run: |
           
           SCAN_FILE="njsscan-result.json"
