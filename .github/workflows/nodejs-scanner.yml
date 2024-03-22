@@ -55,7 +55,7 @@ jobs:
           medium_vuln_count=0
           info_vuln_count=0
           total_vuln_count=0
-          
+          jq --version
           function update_severity_count {
           
               context="$1"
