@@ -113,7 +113,7 @@ jobs:
           fi
           
       - name: Extract Job URL
-        if: ${{ always() && env.SCAN_FAILED == 'true' }}
+        if: ${{ always() && env.NJS_SCAN_FAILED == 'true' }}
         run: |
           job_id=$(curl -L \
             -H "Accept: application/vnd.github+json" \
@@ -127,7 +127,7 @@ jobs:
           fi
           
       - name: Send custom JSON data to Slack workflow
-        if: ${{ always() && env.SCAN_FAILED  == 'true' }}
+        if: ${{ always() && env.NJS_SCAN_FAILED  == 'true' }}
         uses: slackapi/slack-github-action@6c661ce58804a1a20f6dc5fbee7f0381b469e001 # v1.25.0
         with:
           # For posting a rich message using Block Kit
