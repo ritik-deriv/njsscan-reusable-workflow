@@ -46,6 +46,10 @@ jobs:
       - name: Parse JSON Scan File
         if: ${{ always() }}
         run: |
+
+          # We are using jq in docker because the functionality to 
+          # dynamically select keys wasn't working with jq-1.6 
+          # which is installed by default in github actions runner.
           
           SCAN_FILE="njsscan-result.json"
           scan_failed=false
