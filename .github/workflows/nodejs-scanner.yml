@@ -38,7 +38,7 @@ jobs:
           
       - name: NodeJS Scan - JSON Format
         run: |
-          njsscan . --config .njsscan.conf.yml --exit-warning --json --output njsscan-result.json
+          njsscan . --config .njsscan-config.yml --exit-warning --json --output njsscan-result.json
 
       - name: Parse JSON Scan File
         if: ${{ always() }}
