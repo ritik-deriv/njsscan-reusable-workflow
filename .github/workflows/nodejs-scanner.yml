@@ -39,7 +39,16 @@ jobs:
       - name: NodeJS Scan - Table Format
         run: |
           njsscan . --config .njsscan-config.yml --exit-warning > njsscan-result.out 2>&1
+          
+          echo "Catting main file"
+          cat njsscan-result.out
+
+          echo "Catting after grep"
           cat njsscan-result.out | grep -vE -- "- Pattern Match|- Semantic Grep"
+          
+          echo "Catting clean file"
+          cat njsscan-result.out | grep -vE -- "- Pattern Match|- Semantic Grep" > clean.out
+          cat clean.out
 
       - name: NodeJS Scan - JSON Format
         if: ${{ always() }}
