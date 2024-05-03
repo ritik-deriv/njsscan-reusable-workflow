@@ -38,7 +38,7 @@ jobs:
           
       - name: NodeJS Scan - JSON Format
         run: |
-          set +e
+          # set +e
           njsscan . --config .njsscan-config.yml --json --output njsscan-result.json || true
 
       - name: Parse JSON Scan File
