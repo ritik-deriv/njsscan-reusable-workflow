@@ -38,7 +38,6 @@ jobs:
           
       - name: NodeJS Scan - JSON Format
         run: |
-          # set +e
           njsscan . --config .njsscan-config.yml --json --output njsscan-result.json || true
 
       - name: Parse JSON Scan File
@@ -114,8 +113,7 @@ jobs:
 
       - name: NodeJS Scan - Table Format
         run: |
-          set +e
-          njsscan . --config .njsscan-config.yml > njsscan-result.out 2>&1
+          njsscan . --config .njsscan-config.yml > njsscan-result.out 2>&1 || true
           cat njsscan-result.out | grep -vE -- "- Pattern Match|- Semantic Grep"
 
           if [[ "$NJS_SCAN_FAILED" == "true" ]]
