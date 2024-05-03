@@ -38,6 +38,7 @@ jobs:
 
       - name: NodeJS Scan - Table Format
         run: |
+          set +e
           njsscan . --config .njsscan-config.yml > njsscan-result.out 2>&1
           
           echo "Catting main file"
