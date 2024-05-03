@@ -35,20 +35,8 @@ jobs:
       - name: Install njsscan
         run: |
           pip3 install njsscan==0.3.7
-
-      - name: NodeJS Scan - Table Format
-        run: |
-          set +e
-          njsscan . --config .njsscan-config.yml > njsscan-result.out 2>&1
-          cat njsscan-result.out | grep -vE -- "- Pattern Match|- Semantic Grep"
-          
-      - name: Display Results - Table Format
-        if: ${{ always() }}
-        run: |
-          cat njsscan-result.out | grep -vE -- "- Pattern Match|- Semantic Grep"
           
       - name: NodeJS Scan - JSON Format
-        if: ${{ always() }}
         run: |
           njsscan . --config .njsscan.conf.yml --exit-warning --json --output njsscan-result.json
 
@@ -124,7 +112,19 @@ jobs:
               echo "NJS_SCAN_SUMMARY=${scan_summary}" >> $GITHUB_ENV
               exit 1
           fi
-          
+
+      - name: NodeJS Scan - Table Format
+        if: ${{ always() }}
+        run: |
+          set +e
+          njsscan . --config .njsscan-config.yml > njsscan-result.out 2>&1
+          cat njsscan-result.out | grep -vE -- "- Pattern Match|- Semantic Grep"
+
+          if [[ "$NJS_SCAN_FAILED" == "true" ]]
+          then
+            exit 1
+          fi
+        
       - name: Extract Job URL
         if: ${{ always() && env.NJS_SCAN_FAILED == 'true' }}
         run: |
