@@ -51,6 +51,7 @@ jobs:
           cat clean.out
           
       - name: Display Results - Table Format
+        if: ${{ always() }}
         run: |
           echo "Catting main file"
           cat njsscan-result.out
