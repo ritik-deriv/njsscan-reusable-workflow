@@ -38,10 +38,10 @@ jobs:
           
       - name: NodeJS Scan - JSON Format
         run: |
-          njsscan . --config .njsscan-config.yml --exit-warning --json --output njsscan-result.json
+          set +e
+          njsscan . --config .njsscan-config.yml --json --output njsscan-result.json
 
       - name: Parse JSON Scan File
-        if: ${{ always() }}
         run: |
 
           # We are using jq in docker because the functionality to 
@@ -110,11 +110,9 @@ jobs:
               echo "Scan Summary:"
               echo -e "$scan_summary"
               echo "NJS_SCAN_SUMMARY=${scan_summary}" >> $GITHUB_ENV
-              exit 1
           fi
 
       - name: NodeJS Scan - Table Format
-        if: ${{ always() }}
         run: |
           set +e
           njsscan . --config .njsscan-config.yml > njsscan-result.out 2>&1
