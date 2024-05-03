@@ -32,21 +32,19 @@ jobs:
       - name: Checkout code v4
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
 
-      - name: Check Python Version
+      - name: Install njsscan
         run: |
-          which python3
-          python3 --version
+          pip3 install njsscan==0.3.7
 
       - name: NodeJS Scan - Table Format
-        uses: ajinabraham/njsscan-action@74e5a58c1edb363b84c9ddd626b0e22f038ac09e
-        with:
-          args: '. --config .njsscan.conf.yml --exit-warning'
+        run: |
+          njsscan . --config .njsscan-config.yml --exit-warning > njsscan-result.out
+          cat njsscan-result.out | grep -vE -- "- Pattern Match|- Semantic Grep"
 
       - name: NodeJS Scan - JSON Format
         if: ${{ always() }}
-        uses: ajinabraham/njsscan-action@74e5a58c1edb363b84c9ddd626b0e22f038ac09e
-        with:
-          args: '. --config .njsscan.conf.yml --exit-warning --json --output njsscan-result.json'
+        run: |
+          njsscan . --config .njsscan.conf.yml --exit-warning --json --output njsscan-result.json
 
       - name: Parse JSON Scan File
         if: ${{ always() }}
