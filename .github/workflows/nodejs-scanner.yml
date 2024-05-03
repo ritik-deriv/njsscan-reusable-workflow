@@ -40,6 +40,7 @@ jobs:
         run: |
           set +e
           njsscan . --config .njsscan-config.yml --json --output njsscan-result.json
+          echo "abcd"
 
       - name: Parse JSON Scan File
         run: |
