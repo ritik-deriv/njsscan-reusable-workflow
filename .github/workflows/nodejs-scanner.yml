@@ -149,28 +149,28 @@ jobs:
             echo "NJS_JOB_URL=${job_url}" >> $GITHUB_ENV   
           fi
           
-      # - name: Send custom JSON data to Slack workflow
-      #   if: ${{ always() && env.NJS_SCAN_FAILED  == 'true' }}
-      #   uses: slackapi/slack-github-action@6c661ce58804a1a20f6dc5fbee7f0381b469e001 # v1.25.0
-      #   with:
-      #     # For posting a rich message using Block Kit
-      #     payload: |
-      #       {
-      #         "blocks": [
-      #           {
-      #             "type": "section",
-      #             "text": {
-      #               "type": "mrkdwn",
-      #               "text": ":red-alert: *NodeJS Scan Failed*"
-      #             }
-      #           },
-      #           {
-      #             "type": "section",
-      #             "text": {
-      #               "type": "mrkdwn",
-      #               "text": "`Workflow Run:` ${{ env.NJS_WORKFLOW_RUN_URL }}\n\n`JOB URL:` ${{ env.NJS_JOB_URL || env.JOB_URL_NOT_FOUND }}\n\n`Pull Request:` ${{ env.NJS_PR_URL }}\n\n`Head Commit:` ${{ env.NJS_HEAD_COMMIT }}\n\n`PR Creator:` *${{ env.NJS_PR_CREATOR }}*\n\n`Latest Committer:` *${{ env.NJS_SENDER }}*\n\n`Scan Summary:` ${{ env.NJS_SCAN_SUMMARY }}"
-      #             }
-      #           }
-      #         ]
-      #       }
+      - name: Send custom JSON data to Slack workflow
+        if: ${{ failure() }}
+        uses: slackapi/slack-github-action@6c661ce58804a1a20f6dc5fbee7f0381b469e001 # v1.25.0
+        with:
+          # For posting a rich message using Block Kit
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":red-alert: *NodeJS Scan Failed*"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "`Workflow Run:` ${{ env.NJS_WORKFLOW_RUN_URL }}\n\n`JOB URL:` ${{ env.NJS_JOB_URL || env.JOB_URL_NOT_FOUND }}\n\n`Pull Request:` ${{ env.NJS_PR_URL }}\n\n`Head Commit:` ${{ env.NJS_HEAD_COMMIT }}\n\n`PR Creator:` *${{ env.NJS_PR_CREATOR }}*\n\n`Latest Committer:` *${{ env.NJS_SENDER }}*\n\n`Scan Summary:` ${{ env.NJS_SCAN_SUMMARY }}"
+                  }
+                }
+              ]
+            }
           
