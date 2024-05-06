@@ -46,6 +46,8 @@ jobs:
             - INFO
           EOF
           fi
+
+          cat .njsscan-config.yml
         
           
       - name: NodeJS Scan - JSON Format
