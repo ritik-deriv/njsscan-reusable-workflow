@@ -35,6 +35,18 @@ jobs:
       - name: Install njsscan
         run: |
           pip3 install njsscan==0.3.7
+
+      - name: Create Config File if not present
+        run: |
+          if [[ ! -f .njsscan-config.yml ]]; then
+            cat << EOF > .njsscan-config.yml
+          severity-filter:
+            - ERROR
+            - WARNING
+            - INFO
+          EOF
+          fi
+        
           
       - name: NodeJS Scan - JSON Format
         run: |
